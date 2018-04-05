@@ -51,9 +51,8 @@ public class LoginServlet extends HttpServlet {
                  //response.sendRedirect(request.getContextPath()+"/jsp/home.jsp");
 //                response.setStatus(response.SC_MOVED_TEMPORARILY);
 //                response.setHeader("Location", homeURI);
-               //
                 //response.sendRedirect(request.getContextPath()+"/home");
-               // messages.put("ok", ""+request.getSession().getId());
+
                 //return;
             }
             else{

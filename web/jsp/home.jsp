@@ -9,8 +9,9 @@
 <html>
 <head>
     <title>HOME</title>
+    <%String saluto = "Ciao"; %>
 </head>
 <body>
-
+<h1><%=request.getAttribute("benvenuto")%></h1>
 </body>
 </html>

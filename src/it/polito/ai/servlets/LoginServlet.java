@@ -2,6 +2,7 @@ package it.polito.ai.servlets;
 
 import it.polito.ai.utilities.User;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,14 +39,21 @@ public class LoginServlet extends HttpServlet {
             boolean isPresent = user.findUser(username, md5_password);
 
             if(isPresent){
-                String homeURI = request.getContextPath()+"/home";
+                RequestDispatcher dispatcher;
 //                HttpSession session = request.getSession();
 //                session.setAttribute("user", username);
                 //response.sendRedirect("home.jsp");
                 request.getSession().setAttribute("user", username);
-                response.sendRedirect(homeURI);
+                request.setAttribute("benvenuto", "Login Effettuato con successo!");
+                dispatcher = getServletContext().getRequestDispatcher("/jsp/home.jsp");
+                dispatcher.forward(request, response);
+                 //response.sendRedirect(request.getContextPath()+"/jsp/home.jsp");
+//                response.setStatus(response.SC_MOVED_TEMPORARILY);
+//                response.setHeader("Location", homeURI);
+               //
+                //response.sendRedirect(request.getContextPath()+"/home");
                // messages.put("ok", ""+request.getSession().getId());
-                return;
+                //return;
             }
             else{
                 messages.put("login", "Unknown login, please try again");

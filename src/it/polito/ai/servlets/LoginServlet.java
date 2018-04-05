@@ -44,7 +44,8 @@ public class LoginServlet extends HttpServlet {
 //                session.setAttribute("user", username);
                 //response.sendRedirect("home.jsp");
                 request.getSession().setAttribute("user", username);
-                request.setAttribute("benvenuto", "Login Effettuato con successo!");
+                //getServletContext().setAttribute("welcome", "Login effettutato con successo!");
+                request.setAttribute("welcome", "Login Effettuato con successo!");
                 dispatcher = getServletContext().getRequestDispatcher("/jsp/home.jsp");
                 dispatcher.forward(request, response);
                  //response.sendRedirect(request.getContextPath()+"/jsp/home.jsp");

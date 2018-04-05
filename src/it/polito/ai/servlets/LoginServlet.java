@@ -66,6 +66,8 @@ public class LoginServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
     }
 
+    /*quando l'utente scrive localhost:8080/login
+    * gli ritorno la pagina di login*/
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
     }

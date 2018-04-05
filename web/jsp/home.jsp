@@ -8,10 +8,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>HOME</title>
+    <title>Pagina di Benvenuto</title>
     <%--<%String saluto = "Ciao"; %>--%>
 </head>
 <body>
-<h1><%=request.getAttribute("welcome")%></h1>
+<h1><%="Benvenuto utente: "+request.getSession().getAttribute("user")%></h1>
 </body>
 </html>

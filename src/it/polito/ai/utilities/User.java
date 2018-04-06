@@ -7,7 +7,7 @@ public class User implements IUser{
 
 
     @Override
-    public boolean findUser(String username, String password) throws IOException {
+    public boolean findUser(String username, String password) throws IOException        {
         String fileName = "/home/simone/IdeaProjects/A1/web/WEB-INF/users.txt";
         BufferedReader br;
         br = new BufferedReader(new FileReader(fileName));

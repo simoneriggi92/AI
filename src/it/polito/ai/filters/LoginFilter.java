@@ -19,7 +19,7 @@ public class LoginFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);    // non creare una sessione se non esste
         String loginURI = request.getContextPath()+"/login";
 
         boolean loggedIn = session != null && session.getAttribute("user") != null;

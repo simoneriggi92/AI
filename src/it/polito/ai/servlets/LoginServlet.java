@@ -3,6 +3,7 @@ package it.polito.ai.servlets;
 import it.polito.ai.utilities.User;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +37,7 @@ public class LoginServlet extends HttpServlet {
         if(messages.isEmpty()){
 
             String md5_password = user.get_MD5_Password(password);
-            boolean isPresent = user.findUser(username, md5_password);
+            boolean isPresent = user.findUser(username, md5_password, getServletContext());
 
             if(isPresent){
                 RequestDispatcher dispatcher;

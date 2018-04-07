@@ -1,5 +1,6 @@
 package it.polito.ai.utilities;
 
+import javax.servlet.ServletContext;
 import java.io.*;
 import java.security.MessageDigest;
 
@@ -7,8 +8,9 @@ public class User implements IUser{
 
 
     @Override
-    public boolean findUser(String username, String password) throws IOException        {
-        String fileName = "/home/simone/IdeaProjects/A1/web/WEB-INF/users.txt";
+    public boolean findUser(String username, String password, ServletContext context) throws IOException        {
+        //String fileName = "/home/simone/IdeaProjects/A1/web/WEB-INF/users.txt";
+        String fileName = context.getRealPath(File.separator + "WEB-INF" + File.separator + "users.txt");
         BufferedReader br;
         br = new BufferedReader(new FileReader(fileName));
         try {

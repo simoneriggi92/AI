@@ -12,18 +12,73 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Il LoginServlet gestisce il login dell'utente.
+ */
 
 @WebServlet(urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
-
-    private User user = new User();
+    HttpSession session;
+    /* quando l'utente scrive localhost:8080/login
+     * gli ritorno la pagina di login */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+
+        String md5_password = get_MD5_Password(password);
+
+        if(StartServlet.users.get(username) != null
+                && StartServlet.users.get(username).getUsername().equals(username)
+                && StartServlet.users.get(username).getPassword().equals(md5_password)){
+
+            session = request.getSession();
+            session.setAttribute("user", username);
+
+            // response.sendRedirect(request.getContextPath() + "/position");
+            RequestDispatcher dispatcher;
+            dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/home.jsp");
+            dispatcher.forward(request, response);
+        }
+        else {
+            response.sendRedirect(request.getContextPath() + "/login");
+        }
+        // se arrivo qua significa che non mi sono loggato
+        // PrintWriter out = response.getWriter();
+        // out.print(messages);
+        // request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+}
+
+    public String get_MD5_Password(String passwordToHash) throws IOException {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(passwordToHash.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+}
+
+
+
+        /*
         Map<String, String> messages = new HashMap<String, String>();
 
         if(username == null || username.isEmpty()){
@@ -35,41 +90,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         if(messages.isEmpty()){
+        */
 
-            String md5_password = user.get_MD5_Password(password);
-            boolean isPresent = user.findUser(username, md5_password, getServletContext());
 
-            if(isPresent){
-                RequestDispatcher dispatcher;
-//                HttpSession session = request.getSession();
-//                session.setAttribute("user", username);
-                //response.sendRedirect("home.jsp");
-                request.getSession().setAttribute("user", username);
-                //getServletContext().setAttribute("welcome", "Login effettutato con successo!");
-                request.setAttribute("welcome", "Login Effettuato con successo!");
-                dispatcher = getServletContext().getRequestDispatcher("/jsp/home.jsp");
-                dispatcher.forward(request, response);
-                 //response.sendRedirect(request.getContextPath()+"/jsp/home.jsp");
-//                response.setStatus(response.SC_MOVED_TEMPORARILY);
-//                response.setHeader("Location", homeURI);
-                //response.sendRedirect(request.getContextPath()+"/home");
 
-                //return;
-            }
-            else{
-                messages.put("login", "Unknown login, please try again");
-            }
-        }
-        //se arrivo qua significa che non mi sono loggato
-        request.setAttribute("messages", messages);
-//        PrintWriter out = response.getWriter();
-//         out.print(messages);
-        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-    }
-
-    /*quando l'utente scrive localhost:8080/login
-    * gli ritorno la pagina di login*/
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
-    }
-}

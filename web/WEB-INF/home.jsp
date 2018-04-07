@@ -13,5 +13,14 @@
 </head>
 <body>
 <h1><%="Benvenuto utente: "+request.getSession().getAttribute("user")%></h1>
+<form action="position" method="post">
+    Latitudine: <input type="text" name="latitude">
+    <br>
+    Longitudine: <input type="text" name="longitude">
+    <br>
+    Data: <input type="text" name="date">
+    <br>
+    <input type="submit" value="Invia">
+</form>
 </body>
 </html>

@@ -3,55 +3,47 @@ package it.polito.ai.utilities;
 import javax.servlet.ServletContext;
 import java.io.*;
 import java.security.MessageDigest;
+import java.util.LinkedList;
 
-public class User implements IUser{
+public class User implements IUser {
+    private String username;
+    private String password;
+    private LinkedList<Position> positionList;
 
-
-    @Override
-    public boolean findUser(String username, String password, ServletContext context) throws IOException        {
-        //String fileName = "/home/simone/IdeaProjects/A1/web/WEB-INF/users.txt";
-        String fileName = context.getRealPath(File.separator + "WEB-INF" + File.separator + "users.txt");
-        BufferedReader br;
-        br = new BufferedReader(new FileReader(fileName));
-        try {
-             String line = br.readLine();
-             String[] tokens;
-            while (line != null) {
-                tokens = line.split(":");
-                if(username.equals(tokens[0]) && password.equals(tokens[1]))
-                    return true;
-                line = br.readLine();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            br.close();
-        }
-        return false;
+    public User(String username, String password) {
+        setUsername(username);
+        setPassword(password);
+        positionList = new LinkedList<Position>();
     }
 
-    @Override
-    public String get_MD5_Password(String passwordToHash) throws IOException {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(passwordToHash.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
-
+    public String getUsername() {
+        return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LinkedList<Position> getPositionList() {
+        return positionList;
+    }
+
+    public void setPositionList(LinkedList<Position> positionList) {
+        this.positionList = positionList;
+    }
+}
 
 //    public static void main(String [] args) throws FileNotFoundException, NoSuchElementException {
 //    }
-   // }
+// }
 //        it.polito.ai.utilities.User user = new it.polito.ai.utilities.User();
 //        boolean isPresent = false;
 //        try {
@@ -65,4 +57,3 @@ public class User implements IUser{
 //            e.printStackTrace();
 //        }
 //    }
-}

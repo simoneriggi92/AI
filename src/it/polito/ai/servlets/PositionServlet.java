@@ -47,7 +47,7 @@ public class PositionServlet extends HttpServlet {
                     throw new PositionNotValidException();
                 }
                 // acquisisco longitudine e faccio verifica
-                longitude = Double.parseDouble(request.getParameter("latitude"));
+                longitude = Double.parseDouble(request.getParameter("longitude"));
                 if (longitude < -180 || longitude > 180) {
                     throw new PositionNotValidException();
                 }

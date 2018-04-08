@@ -52,7 +52,9 @@ public class LoginServlet extends HttpServlet {
             dispatcher.forward(request, response);
         }
         else {
-            response.sendRedirect(request.getContextPath() + "/login");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            // response.sendRedirect(request.getContextPath() + "/login");
+            response.getWriter().println("<html><body><p> Login error </p></body></html>" + HttpServletResponse.SC_FORBIDDEN);
         }
         // se arrivo qua significa che non mi sono loggato
         // PrintWriter out = response.getWriter();

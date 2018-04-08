@@ -54,13 +54,7 @@ public class StartServlet extends HttpServlet {
 
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // forse va messo in init
-
-        PrintWriter pw = response.getWriter();
-        pw.println("<html><head></head><body>");
-        pw.println("<a href=\"/login\"> Fai login </a>");
-        pw.println("CIAO");
-        pw.println("</body></html>");
+        request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request,response);
     }
 }
 

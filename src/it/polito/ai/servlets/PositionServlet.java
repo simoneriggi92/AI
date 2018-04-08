@@ -31,6 +31,7 @@ public class PositionServlet extends HttpServlet {
     private Double longitude;
     private Date timeStamp;
     ConcurrentHashMap<String, User> users;
+    boolean positionNotValid = false;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -57,14 +58,14 @@ public class PositionServlet extends HttpServlet {
                     // salta prossime validazioni e vai direttamente al salvataggio nella mappa
                 } else {
                     Position lastPosition = users.get(session.getAttribute("user")).getPositionList().getLast();
-                    Date lastTemporalStamp = lastPosition.getTemporalStamp();
+                    Date lastTimeStamp = lastPosition.getTimeStamp();
 
-                    if (lastTemporalStamp.after(timeStamp)) {
+                    if (lastTimeStamp.after(timeStamp)) {
                         throw new PositionNotValidException();
                     }
                     // verifico che la velocità sia < di 100 m/s
                     Double distance = Math.sqrt(Math.pow(latitude - lastPosition.getLatitude(), 2) + Math.pow(longitude - lastPosition.getLongitude(), 2));
-                    Double intervalTime = (double) (timeStamp.getTime() - lastTemporalStamp.getTime());
+                    Double intervalTime = (double) (timeStamp.getTime() - lastTimeStamp.getTime());
                     Double speed = distance / intervalTime;
 
                     if (speed >= 100) {
@@ -73,25 +74,30 @@ public class PositionServlet extends HttpServlet {
                 }
             } catch (PositionNotValidException e) {
                 e.printStackTrace();
-                response.sendRedirect(request.getContextPath() + "/position");
+                //response.sendRedirect(request.getContextPath() + "/position");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("<html><body><p> Error inserting position data </p></body></html>" + HttpServletResponse.SC_BAD_REQUEST);
+                positionNotValid = true;
             } catch (ParseException e) {
                 e.printStackTrace();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if(!positionNotValid) {
+                Position position = new Position(latitude, longitude, timeStamp);
 
-            Position position = new Position(latitude, longitude, timeStamp);
+                // salva nella mappa
+                users.get(session.getAttribute("user")).getPositionList().add(position);
+                // salva la mappa nell'application context
+                //this.getServletConfig().getServletContext().setAttribute("users", users);
 
-            // salva nella mappa
-            users.get(session.getAttribute("user")).getPositionList().add(position);
-            // salva la mappa nell'application context
-            //this.getServletConfig().getServletContext().setAttribute("users", users);
-
-            PrintWriter pw = response.getWriter();
-            pw.println("<html><head></head><body>");
-            pw.println(session.getAttribute("user") + ", la tua posizione e' stata aggiunta correttamente!");
-            pw.println(users.get("wolly").getPositionList().getLast().getTemporalStamp());
-            pw.println("</body></html>");
+                PrintWriter pw = response.getWriter();
+                pw.println("<html><head></head><body>");
+                pw.println(session.getAttribute("user") + ", la tua posizione e' stata aggiunta correttamente!");
+                pw.println(users.get("wolly").getPositionList().getLast().getTimeStamp().toString());
+                pw.println("</body></html>");
+            }
         }
     }
 

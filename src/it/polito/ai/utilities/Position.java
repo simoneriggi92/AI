@@ -5,12 +5,12 @@ import java.util.Date;
 public class Position {
     private double latitude;
     private double longitude;
-    private Date temporalStamp;
+    private Date timeStamp;
 
-    public Position(double latitude, double longitude, Date temporalStamp) {
+    public Position(double latitude, double longitude, Date timeStamp) {
         setLatitude(latitude);
         setLongitude(longitude);
-        setTemporalStamp(temporalStamp);
+        setTimeStamp(timeStamp);
     }
 
     public double getLatitude() {
@@ -29,11 +29,11 @@ public class Position {
         this.longitude = longitude;
     }
 
-    public Date getTemporalStamp() {
-        return temporalStamp;
+    public Date getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setTemporalStamp(Date temporalStamp) {
-        this.temporalStamp = temporalStamp;
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

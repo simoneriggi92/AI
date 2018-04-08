@@ -50,16 +50,7 @@ public class LoginFilter implements Filter {
            // out.println("Redirect alla pagina di login..");
             response.sendRedirect(loginURI);
         }
-       /* PrintWriter out = response.getWriter();
 
-        if(session == null){
-            out.println(session.getId());
-        }
-        else{
-            out.println(session.getId());
-        }
-        out.close();
-        chain.doFilter(req, resp);*/
     }
 
 

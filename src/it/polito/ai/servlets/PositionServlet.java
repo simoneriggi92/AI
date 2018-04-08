@@ -30,9 +30,12 @@ public class PositionServlet extends HttpServlet {
     private Double latitude;
     private Double longitude;
     private Date timeStamp;
+    ConcurrentHashMap<String, User> users;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // recupera la mappa dall'application context
+        users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
         HttpSession session = request.getSession(false);
         if(session != null) {
 
@@ -48,14 +51,12 @@ public class PositionServlet extends HttpServlet {
                     throw new PositionNotValidException();
                 }
                 // acquisisco data e faccio verifica
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/mm/dd hh:mm:ss");
-                timeStamp = formatter.parse(request.getParameter("date"));
-
-                //if(LoginServlet.users.get(session.getAttribute("user")) == null) ;
-                if (StartServlet.users.get(session.getAttribute("user")).getPositionList().isEmpty()) {
-                    // salta prossime validazioni e vai direttamente al PositionServlet
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                timeStamp = sdf.parse(request.getParameter("date"));
+                if (users.get(session.getAttribute("user")).getPositionList().isEmpty()) {
+                    // salta prossime validazioni e vai direttamente al salvataggio nella mappa
                 } else {
-                    Position lastPosition = StartServlet.users.get(session.getAttribute("user")).getPositionList().getLast();
+                    Position lastPosition = users.get(session.getAttribute("user")).getPositionList().getLast();
                     Date lastTemporalStamp = lastPosition.getTemporalStamp();
 
                     if (lastTemporalStamp.after(timeStamp)) {
@@ -81,11 +82,15 @@ public class PositionServlet extends HttpServlet {
 
             Position position = new Position(latitude, longitude, timeStamp);
 
-            StartServlet.users.get(session.getAttribute("user")).getPositionList().add(position);
+            // salva nella mappa
+            users.get(session.getAttribute("user")).getPositionList().add(position);
+            // salva la mappa nell'application context
+            //this.getServletConfig().getServletContext().setAttribute("users", users);
 
             PrintWriter pw = response.getWriter();
             pw.println("<html><head></head><body>");
             pw.println(session.getAttribute("user") + ", la tua posizione e' stata aggiunta correttamente!");
+            pw.println(users.get("wolly").getPositionList().getLast().getTemporalStamp());
             pw.println("</body></html>");
         }
     }

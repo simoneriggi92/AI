@@ -16,11 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @WebServlet(urlPatterns = "/index")
 public class StartServlet extends HttpServlet {
-    public static ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();;
+    public ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();;
 
     @Override
     public void init() {
-
+        // salva la concurrentHashMap nel contest applicativo
+        this.getServletConfig().getServletContext().setAttribute("users", users);
         // leggi da file
         String fileName = getServletContext().getRealPath(File.separator + "WEB-INF" + File.separator + "users.txt");
         BufferedReader br = null;

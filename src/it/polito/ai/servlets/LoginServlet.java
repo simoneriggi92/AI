@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebServlet(urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
     HttpSession session;
+    ConcurrentHashMap<String, User> users;
     /* quando l'utente scrive localhost:8080/login
      * gli ritorno la pagina di login */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -34,12 +35,13 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
+        // recupera la mappa dall'application context
+        users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
         String md5_password = get_MD5_Password(password);
 
-        if(StartServlet.users.get(username) != null
-                && StartServlet.users.get(username).getUsername().equals(username)
-                && StartServlet.users.get(username).getPassword().equals(md5_password)){
+        if(users.get(username) != null
+                && users.get(username).getUsername().equals(username)
+                && users.get(username).getPassword().equals(md5_password)){
 
             session = request.getSession();
             session.setAttribute("user", username);

@@ -1,10 +1,16 @@
 package it.polito.ai.servlets;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.sun.media.sound.RealTimeSequencerProvider;
+import com.sun.org.apache.regexp.internal.RE;
 import it.polito.ai.utilities.GeoFunction;
 import it.polito.ai.utilities.Position;
 import it.polito.ai.utilities.PositionNotValidException;
 import it.polito.ai.utilities.User;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 //import sun.awt.image.ImageWatched;
 
 import javax.servlet.ServletException;
@@ -29,16 +35,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PositionServlet extends HttpServlet {
     private Double latitude;
     private Double longitude;
+    JSONArray jsonArray ;
     private long timeStamp;
     ConcurrentHashMap<String, User> users;
     ArrayList<Position> candidatePositionsList = new ArrayList<>();
     boolean allPositionsValid = false;
+    boolean valid = true;
 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // recupera la mappa degli utenti dall'application context
         users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
+
 
         // recupera la sessione corrente
         HttpSession session = request.getSession(false);
@@ -74,8 +83,25 @@ public class PositionServlet extends HttpServlet {
                 }
                 else {
                     // almeno una posizione non è valida
+                    try {
+                        System.out.println("RISPOSTA:"+jsonArray.get(0).toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                    response.getWriter().println("<html><body><p>" + session.getAttribute("user") + ", one or more position are not valid! </p></body></html>" + HttpServletResponse.SC_BAD_REQUEST);
+                    response.setContentType("application/json");
+                    PrintWriter pw = response.getWriter();
+                    pw.println("#rejected:"+jsonArray.length());
+                    pw.println(jsonArray);
+                    pw.flush();
+                    /*clear della lista*/
+                    for(int i = 0; i<jsonArray.length();i++){
+                        jsonArray.remove(i);
+                    }
+
+
+
+                    //response.getWriter().println("<html><body><p>" + session.getAttribute("user") + ", one or more position are not valid! </p></body></html>" + HttpServletResponse.SC_BAD_REQUEST);
                 }
             }
             else {
@@ -129,10 +155,11 @@ public class PositionServlet extends HttpServlet {
 
     private boolean addCandidatePositions(ArrayList<Position> candidatePositionsList, String username) {
         boolean positionValid = false;
-        boolean allPositionValid = false;
+        boolean allPositionValid = true;
 
         Iterator<Position> iter = candidatePositionsList.iterator();
         try {
+
             while (iter.hasNext()) {
                 //for (Position position : candidatePositionsList) {
                 Position position = iter.next();
@@ -140,15 +167,16 @@ public class PositionServlet extends HttpServlet {
                 if (positionValid) {
                     // salva posizione nella mappa positionList dell'utente
                     users.get(username).getPositionList().add(position);
-                    allPositionValid = true;
+                    //allPositionValid = true;
                     System.out.println("utenti: "+users.get(username).getPositionList().size());
 
                 } else {
+                    allPositionValid = false;
                     // rimuovi posizione dalla mappa candidatePositionsList
                     System.out.println("PRIMA" + candidatePositionsList.size());
                     System.out.println("utenti: "+users.get(username).getPositionList().size());
                     iter.remove();
-                    allPositionValid = false;
+
                     System.out.println("DOPO:" + candidatePositionsList.size());
 
                 }
@@ -169,6 +197,7 @@ public class PositionServlet extends HttpServlet {
 //            users.get(username).getPositionList().remove(pos);
 //        }
         System.out.println("POSITION USERS 2 VOLTA fine" + users.get(username).getPositionList().size());
+        System.out.println(("AllPositionValid: "+allPositionValid));
         return allPositionValid;
     }
 
@@ -176,13 +205,13 @@ public class PositionServlet extends HttpServlet {
         try {
             // acquisisco latitudine e faccio verifica
             if (position.getLatitude() < -90L || position.getLatitude() > 90L) {
-
+                createResponse(position,"latitude");
                 throw new PositionNotValidException();
 
             }
             // acquisisco longitudine e faccio verifica
             if (position.getLongitude() < -180L || position.getLongitude() > 180L) {
-
+                createResponse(position,"longitude");
                 throw new PositionNotValidException();
             }
             // acquisisco data e faccio verifica
@@ -197,6 +226,7 @@ public class PositionServlet extends HttpServlet {
                 System.out.println("AH" + "timestampdellaposizionecorrente"+position.getTimeStamp() + " ultimo timestamp della lista utenti" + lastTimeStamp);
                 // verifica di coerenza cronologica
                 if (lastTimeStamp > position.getTimeStamp()) {
+                    createResponse(position, "timestamp");
                     System.out.println("AZ" + position.getTimeStamp() + " " + lastTimeStamp);
                     //throw new PositionNotValidException();
                 }
@@ -208,6 +238,7 @@ public class PositionServlet extends HttpServlet {
                 Double speed = distance / intervalTime;
                 // verifica coerenza spazio-temporale
                 if (speed >= 100D) {
+                    createResponse(position, "speed");
                     //throw new PositionNotValidException();
                 }
             }
@@ -219,6 +250,26 @@ public class PositionServlet extends HttpServlet {
         return true;
     }
 
+
+    /*
+    * Metodo per creare oggetti json
+    * Riempire array di errori da ritornare al client
+    * */
+    public void createResponse(Position pos, String reason){
+
+        JSONObject obj = new JSONObject();
+        try {
+            jsonArray = new JSONArray();
+            obj.put("latitude",pos.getLatitude());
+            obj.put("longitude", pos.getLongitude());
+            obj.put("timeStamp", pos.getTimeStamp());
+            obj.put("description", reason);
+            jsonArray.put(obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 
 }

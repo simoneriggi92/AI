@@ -15,7 +15,6 @@ public class User implements IUser {
         setPassword(password);
         positionList = new LinkedList<Position>();
     }
-
     public String getUsername() {
         return username;
     }

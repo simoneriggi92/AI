@@ -10,8 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -23,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @WebServlet(urlPatterns = "/login")
-public class LoginServlet extends HttpServlet {
+public class    LoginServlet extends HttpServlet {
     HttpSession session;
     ConcurrentHashMap<String, User> users;
     /* quando l'utente scrive localhost:8080/login
@@ -35,9 +34,14 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+
+        if(request.getParameter("username") == null || request.getParameter("password")== null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.reset();
+        }
         // recupera la mappa dall'application context
         users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
-        String md5_password = get_MD5_Password(password);
+        String md5_password = password/*get_MD5_Password(password)*/;
 
         if(users.get(username) != null
                 && users.get(username).getUsername().equals(username)
@@ -76,7 +80,49 @@ public class LoginServlet extends HttpServlet {
 
     }
 
+    @Override
+    public void init() {
+        ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();
+        ;
+
+        // salva la concurrentHashMap nel contest applicativo
+        this.getServletConfig()
+                .getServletContext()
+                .setAttribute("users", users);
+
+        // leggi da file
+        String fileName = getServletContext().getRealPath(File.separator + "WEB-INF" + File.separator + "users.txt");
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(fileName));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // lanciare internal server error exception
+        }
+        try {
+            String line = br.readLine();
+            String[] tokens;
+            while (line != null) {
+                tokens = line.split(":");
+                User user = new User(tokens[0], tokens[1]);
+                users.put(user.getUsername(), user);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
+
+
 
 
 

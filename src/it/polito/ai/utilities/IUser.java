@@ -7,5 +7,6 @@ import java.security.NoSuchAlgorithmException;
 
 public interface IUser {
 
+
 }
 

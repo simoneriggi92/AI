@@ -103,7 +103,7 @@ public class RangeServlet extends HttpServlet{
                 System.out.println("Size RangeList: " + rangeList.size());
                 for (Position p : rangeList) {
                     pw.println("Posizione " + i + " --- Latitudine: " + p.getLatitude()
-                            + " --- Longitudine: " + p.getLongitude() + " --- TimeStamp: " + convertTime(p.getTimeStamp()));
+                            +  " --- Longitudine: " + p.getLongitude() + " --- TimeStamp: " + convertTime(p.getTimeStamp()));
                     i++;
                 }
             //}

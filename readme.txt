@@ -1,5 +1,4 @@
-la classe User ora contiene una lista di oggetti di tipo Position
-
-C'è un PositionServlet che valida i dati inseriti della posizione e li aggiunge alla lsita dell'utente corrispettivo facendo accesso su una cuncurrenthashmap username-User
-
-La validazione lancia eccezioni sui controlli del range ma non riesce a vedere quando una marca temporale è strettamente crescente o se la velocità è minore di 100 perchè la mappa non si aggiorna bene
+Inserito codice per la gestione di richieste di tipo jsono in PositionServlet.
+Il casting da oggetto json a oggetto Position non va: probabilmente è
+necessario fare singolarmente i casting a Double e a Date dei valori prelevati
+dagli oggetti jason e creare poi gli oggetti Position

@@ -2,8 +2,6 @@ package it.polito.ai.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.media.sound.RealTimeSequencerProvider;
-import com.sun.org.apache.regexp.internal.RE;
 import it.polito.ai.utilities.GeoFunction;
 import it.polito.ai.utilities.Position;
 import it.polito.ai.utilities.PositionNotValidException;
@@ -228,18 +226,18 @@ public class PositionServlet extends HttpServlet {
                 if (lastTimeStamp > position.getTimeStamp()) {
                     createResponse(position, "timestamp");
                     System.out.println("AZ" + position.getTimeStamp() + " " + lastTimeStamp);
-                    //throw new PositionNotValidException();
+                    throw new PositionNotValidException();
                 }
                 // verifico che la velocità sia < di 100 m/s
-                //Double distance = GeoFunction.distance(position.getLatitude(), position.getLatitude(), lastPosition.getLatitude(), lastPosition.getLongitude());
-//
-                Double distance = Math.sqrt(Math.pow(position.getLatitude() - lastPosition.getLatitude(), 2) + Math.pow(position.getLongitude() - lastPosition.getLongitude(), 2));
+
+                Double distance = GeoFunction.distance(position.getLatitude(), position.getLongitude(), lastPosition.getLatitude(), lastPosition.getLongitude())*1000;
+                //Double distance = Math.sqrt(Math.pow(position.getLatitude() - lastPosition.getLatitude(), 2) + Math.pow(position.getLongitude() - lastPosition.getLongitude(), 2));
                 Double intervalTime = (double) (position.getTimeStamp() - lastTimeStamp);
                 Double speed = distance / intervalTime;
                 // verifica coerenza spazio-temporale
                 if (speed >= 100D) {
                     createResponse(position, "speed");
-                    //throw new PositionNotValidException();
+                    throw new PositionNotValidException();
                 }
             }
             //users.get(username).getPositionList().add(position);

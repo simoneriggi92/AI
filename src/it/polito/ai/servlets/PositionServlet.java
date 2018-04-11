@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PositionServlet extends HttpServlet {
     private Double latitude;
     private Double longitude;
-    JSONArray jsonArray ;
+    JSONArray jsonArray = new JSONArray();
     private long timeStamp;
     ConcurrentHashMap<String, User> users;
     ArrayList<Position> candidatePositionsList = new ArrayList<>();
@@ -82,7 +82,10 @@ public class PositionServlet extends HttpServlet {
                 else {
                     // almeno una posizione non è valida
                     try {
-                        System.out.println("RISPOSTA:"+jsonArray.get(0).toString());
+                        for(int i =0; i < jsonArray.length(); i++) {
+                            System.out.println("RISPOSTA" + i + ":" + jsonArray.get(i).toString());
+                        }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -257,7 +260,7 @@ public class PositionServlet extends HttpServlet {
 
         JSONObject obj = new JSONObject();
         try {
-            jsonArray = new JSONArray();
+            //jsonArray = new JSONArray();
             obj.put("latitude",pos.getLatitude());
             obj.put("longitude", pos.getLongitude());
             obj.put("timeStamp", pos.getTimeStamp());

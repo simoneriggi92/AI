@@ -15,11 +15,11 @@ public class LogoutServlet  extends HttpServlet {
    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
        response.setContentType("text/html");
 
-       PrintWriter pw = response.getWriter();
+       //PrintWriter pw = response.getWriter();
        HttpSession session = request.getSession();
        session.invalidate();
 
-       pw.println("Logout effettuato!");
-       pw.close();
+//       pw.println("Logout effettuato!");
+//       pw.close();
    }
 }

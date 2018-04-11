@@ -25,8 +25,6 @@ public class RangeServlet extends HttpServlet{
 
     ConcurrentHashMap<String, User> users;
     User currentUser;
-    boolean found = false;
-    public int dx_limit=0, sx_limit=0;
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -55,7 +53,7 @@ public class RangeServlet extends HttpServlet{
             currentUser = users.get(session.getAttribute("user"));
 
             System.out.println("SIZE(GET): " + currentUser.getPositionList().size());
-            System.out.println("ULTIMO: "+currentUser.getPositionList().getLast().getTimeStamp());
+            //System.out.println("ULTIMO: "+currentUser.getPositionList().getLast().getTimeStamp());
             //se endTimeStamp > ultimo TimeStamp della lista-> endTimeStamp aggiornato
             if (endTimestamp > currentUser.getPositionList().getLast().getTimeStamp()) {
                 endTimestamp = currentUser.getPositionList().getLast().getTimeStamp();
@@ -97,13 +95,12 @@ public class RangeServlet extends HttpServlet{
                 }
 
                 PrintWriter pw = resp.getWriter();
-                pw.println(session.getAttribute("user") + ", !");
 
                 int i = 1;
-                System.out.println("Size RangeList: " + rangeList.size());
+                System.out.println("#Positions: " + rangeList.size());
                 for (Position p : rangeList) {
-                    pw.println("Posizione " + i + " --- Latitudine: " + p.getLatitude()
-                            +  " --- Longitudine: " + p.getLongitude() + " --- TimeStamp: " + convertTime(p.getTimeStamp()));
+                    pw.println("Position " + i + " --- Latitude: " + p.getLatitude()
+                            +  " --- Longitude: " + p.getLongitude() + " --- TimeStamp: " + convertTime(p.getTimeStamp()));
                     i++;
                 }
             //}

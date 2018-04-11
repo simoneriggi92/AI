@@ -27,9 +27,9 @@ public class    LoginServlet extends HttpServlet {
     ConcurrentHashMap<String, User> users;
     /* quando l'utente scrive localhost:8080/login
      * gli ritorno la pagina di login */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
-    }
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
+//    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
@@ -39,7 +39,7 @@ public class    LoginServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.reset();
         }
-        // recupera la mappa dall'application context
+        // r    ecupera la mappa dall'application context
         users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
         String md5_password = password/*get_MD5_Password(password)*/;
 
@@ -58,7 +58,7 @@ public class    LoginServlet extends HttpServlet {
         else {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             // response.sendRedirect(request.getContextPath() + "/login");
-            response.getWriter().println("<html><body><p> Login error </p></body></html>" + HttpServletResponse.SC_FORBIDDEN);
+            //  response.getWriter().println("<html><body><p> Login error </p></body></html>" + HttpServletResponse.SC_FORBIDDEN);
         }
         // se arrivo qua significa che non mi sono loggato
         // PrintWriter out = response.getWriter();

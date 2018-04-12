@@ -50,7 +50,7 @@ public class PositionServlet extends HttpServlet {
         // recupera la sessione corrente
         HttpSession session = request.getSession(false);
         if(session != null) {
-            System.out.println("POSITION USERS 2 VOLTA INIO" + users.get(session.getAttribute("user")).getPositionList().size());
+            // System.out.println("POSITION USERS 2 VOLTA INIO" + users.get(session.getAttribute("user")).getPositionList().size());
             // verifico se la richiesta è di tipo json
             if(request.getContentType().equals("application/json")) {
                 Position position = null;
@@ -111,8 +111,7 @@ public class PositionServlet extends HttpServlet {
                 //response.getWriter().println("<html><body><p>" + session.getAttribute("user") + ", your request is not in json format! Retry </p></body></html>" + HttpServletResponse.SC_BAD_REQUEST);
             }
             this.getServletContext().setAttribute("users", users);
-            System.out.println("POSITION USERS 2 VOLTA fine" + users.get(session.getAttribute("user")).getPositionList().size());
-
+//            System.out.println("POSITION USERS 2 VOLTA fine" + users.get(session.getAttribute("user")).getPositionList().size());
         }
 
     }
@@ -123,11 +122,12 @@ public class PositionServlet extends HttpServlet {
         ArrayList<Position> candidatePositionsList = new ArrayList<>();
 
         // definisci array positions, dove ogni elemento contiene un oggetto json
-        sb = sb.substring(1);System.out.println("flusso: " + sb.toString());
+        sb = sb.substring(1);
+        // System.out.println("flusso: " + sb.toString());
         String[] positions = sb.toString().split("},");
-        for(String s : positions) {
-            System.out.println(s + "---");
-        }
+//        for(String s : positions) {
+//            System.out.println(s + "---");
+//        }
 
         for(int i = 0; i < positions.length; i++) {
             if(i != positions.length - 1) {
@@ -146,10 +146,10 @@ public class PositionServlet extends HttpServlet {
             Position pos = gson.fromJson(a, Position.class);
             candidatePositionsList.add(pos);
         }
-        System.out.println("CANDIDATESLIST" + candidatePositionsList.size());
-        for(Position p : candidatePositionsList) {
-           System.out.println(p.getLatitude() + " " + p.getLongitude() + " " + p.getTimeStamp());
-        }
+//        System.out.println("CANDIDATESLIST" + candidatePositionsList.size());
+//        for(Position p : candidatePositionsList) {
+//           System.out.println(p.getLatitude() + " " + p.getLongitude() + " " + p.getTimeStamp());
+//        }
 
         return candidatePositionsList;
     }
@@ -168,24 +168,24 @@ public class PositionServlet extends HttpServlet {
                 if (positionValid) {
                     // salva posizione nella mappa positionList dell'utente
                     users.get(username).getPositionList().add(position);
-                    //allPositionValid = true;
-                    System.out.println("utenti: "+users.get(username).getPositionList().size());
+                    // allPositionValid = true;
+                    // System.out.println("utenti: "+users.get(username).getPositionList().size());
 
                 } else {
                     allPositionValid = false;
                     // rimuovi posizione dalla mappa candidatePositionsList
-                    System.out.println("PRIMA" + candidatePositionsList.size());
-                    System.out.println("utenti: "+users.get(username).getPositionList().size());
+                    // System.out.println("PRIMA" + candidatePositionsList.size());
+                    // System.out.println("utenti: "+users.get(username).getPositionList().size());
                     iter.remove();
 
-                    System.out.println("DOPO:" + candidatePositionsList.size());
+                    // System.out.println("DOPO:" + candidatePositionsList.size());
 
                 }
             }
-            System.out.println("SIZE(POST): "+users.get(username).getPositionList().size());
+            // System.out.println("SIZE(POST): "+users.get(username).getPositionList().size());
 
         }catch(ConcurrentModificationException ex){
-            System.out.println("ECCCCCCC");
+            // System.out.println("ECCCCCCC");
             throw new ConcurrentModificationException(ex);
 
         }
@@ -197,8 +197,8 @@ public class PositionServlet extends HttpServlet {
 //            System.out.println("ULTIMO: "+pos.getTimeStamp());
 //            users.get(username).getPositionList().remove(pos);
 //        }
-        System.out.println("POSITION USERS 2 VOLTA fine" + users.get(username).getPositionList().size());
-        System.out.println(("AllPositionValid: "+allPositionValid));
+//        System.out.println("POSITION USERS 2 VOLTA fine" + users.get(username).getPositionList().size());
+//        System.out.println(("AllPositionValid: "+allPositionValid));
         return allPositionValid;
     }
 
@@ -224,11 +224,11 @@ public class PositionServlet extends HttpServlet {
                 // prendi l'ultima posizione dalla lista
                 Position lastPosition = users.get(username).getPositionList().getLast();
                 long lastTimeStamp = lastPosition.getTimeStamp();
-                System.out.println("AH" + "timestampdellaposizionecorrente"+position.getTimeStamp() + " ultimo timestamp della lista utenti" + lastTimeStamp);
+                // System.out.println("AH" + "timestampdellaposizionecorrente"+position.getTimeStamp() + " ultimo timestamp della lista utenti" + lastTimeStamp);
                 // verifica di coerenza cronologica
                 if (lastTimeStamp > position.getTimeStamp()) {
                     createResponse(position, "timestamp");
-                    System.out.println("AZ" + position.getTimeStamp() + " " + lastTimeStamp);
+                    // System.out.println("AZ" + position.getTimeStamp() + " " + lastTimeStamp);
                     throw new PositionNotValidException();
                 }
                 // verifico che la velocità sia < di 100 m/s

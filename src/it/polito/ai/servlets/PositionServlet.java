@@ -2,10 +2,7 @@ package it.polito.ai.servlets;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import it.polito.ai.utilities.GeoFunction;
-import it.polito.ai.utilities.Position;
-import it.polito.ai.utilities.PositionNotValidException;
-import it.polito.ai.utilities.User;
+import it.polito.ai.utilities.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +36,7 @@ public class PositionServlet extends HttpServlet {
     ArrayList<Position> candidatePositionsList = new ArrayList<>();
     boolean allPositionsValid = false;
     boolean valid = true;
-
+public static int o = 0;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -66,10 +63,15 @@ public class PositionServlet extends HttpServlet {
                 }
                 // ritorna la lista delle posioni candidate
                 candidatePositionsList = getCandidatePositionsList(sb.toString());
-
+                System.out.println(candidatePositionsList.get(0).getTimeStamp());
+                for(Position p : candidatePositionsList) {
+                    System.out.println("positioncandite" + p.getTimeStamp());
+                }
                 // aggiunge una posizione se valida e ritorna vero se TUTTE le posizioni sono valide
                 allPositionsValid = addCandidatePositions(candidatePositionsList, session.getAttribute("user").toString());
-                System.out.println("POSITION USERS 2 VOLTA fine" + users.get(session.getAttribute("user")).getPositionList().size());
+                // System.out.println("POSITION USERS 2 VOLTA fine" + users.get(session.getAttribute("user")).getPositionList().size());
+
+
 
                 if(allPositionsValid) {
                     // tutte le posizioni sono valide
@@ -81,14 +83,14 @@ public class PositionServlet extends HttpServlet {
                 }
                 else {
                     // almeno una posizione non è valida
-                    try {
-                        for(int i =0; i < jsonArray.length(); i++) {
-                            System.out.println("RISPOSTA" + i + ":" + jsonArray.get(i).toString());
-                        }
+//                    try {
+//                        for(int i =0; i < jsonArray.length(); i++) {
+//                            System.out.println("RISPOSTA" + i + ":" + jsonArray.get(i).toString());
+//                        }
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                     response.setStatus(HttpServletResponse.SC_ACCEPTED);
                     response.setContentType("application/json");
                     PrintWriter pw = response.getWriter();
@@ -203,17 +205,21 @@ public class PositionServlet extends HttpServlet {
     }
 
     private boolean validateCandidatePosition(Position position, String username) {
+        PositionErrors positionErrors = new PositionErrors();
         try {
             // acquisisco latitudine e faccio verifica
             if (position.getLatitude() < -90L || position.getLatitude() > 90L) {
-                createResponse(position,"latitude");
-                throw new PositionNotValidException();
-
+                positionErrors.setError(true);
+                positionErrors.setLatitude(true);
+                // createResponse(position,"latitude");
+                // throw new PositionNotValidException();
             }
             // acquisisco longitudine e faccio verifica
             if (position.getLongitude() < -180L || position.getLongitude() > 180L) {
-                createResponse(position,"longitude");
-                throw new PositionNotValidException();
+                positionErrors.setError(true);
+                positionErrors.setLongitude(true);
+                // createResponse(position,"longitude");
+                // throw new PositionNotValidException();
             }
             // acquisisco data e faccio verifica
             if (users.get(username).getPositionList().isEmpty()) {
@@ -227,9 +233,11 @@ public class PositionServlet extends HttpServlet {
                 // System.out.println("AH" + "timestampdellaposizionecorrente"+position.getTimeStamp() + " ultimo timestamp della lista utenti" + lastTimeStamp);
                 // verifica di coerenza cronologica
                 if (lastTimeStamp > position.getTimeStamp()) {
-                    createResponse(position, "timestamp");
+                    positionErrors.setError(true);
+                    positionErrors.setTimeStamp(true);
+                    // createResponse(position, "timestamp");
                     // System.out.println("AZ" + position.getTimeStamp() + " " + lastTimeStamp);
-                    throw new PositionNotValidException();
+                    // throw new PositionNotValidException();
                 }
                 // verifico che la velocità sia < di 100 m/s
 
@@ -239,13 +247,19 @@ public class PositionServlet extends HttpServlet {
                 Double speed = distance / intervalTime;
                 // verifica coerenza spazio-temporale
                 if (speed >= 100D) {
-                    createResponse(position, "speed");
-                    throw new PositionNotValidException();
+                    positionErrors.setError(true);
+                    positionErrors.setSpeed(true);
+                    //createResponse(position, "speed");
+                    //throw new PositionNotValidException();
+
                 }
+            }
+            if(positionErrors.isError()) {
+                throw new PositionNotValidException();
             }
             //users.get(username).getPositionList().add(position);
         } catch (PositionNotValidException e) {
-            //e.printStackTrace();
+            createResponse(position, positionErrors.getErrors());
             return false;
         }
         return true;

@@ -1,16 +1,17 @@
 package it.polito.ai.utilities;
 
-import java.util.Date;
-
 public class Position {
     private double latitude;
     private double longitude;
-    private long timeStamp;
+    private long timestamp;
 
-    public Position(double latitude, double longitude, long timeStamp) {
+    public Position(){
+
+    }
+    public Position(double latitude, double longitude, long timestamp) {
         setLatitude(latitude);
         setLongitude(longitude);
-        setTimeStamp(timeStamp);
+        setTimestamp(timestamp);
     }
 
     public double getLatitude() {
@@ -29,11 +30,11 @@ public class Position {
         this.longitude = longitude;
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

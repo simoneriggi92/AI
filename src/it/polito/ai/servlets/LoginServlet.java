@@ -22,27 +22,45 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @WebServlet(urlPatterns = "/login")
-public class    LoginServlet extends HttpServlet {
+public class LoginServlet extends HttpServlet {
+
     HttpSession session;
     ConcurrentHashMap<String, User> users;
-    /* quando l'utente scrive localhost:8080/login
-     * gli ritorno la pagina di login */
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
-//    }
+
+    // Quando l'utente digita localhost:8080/login gli ritorno la pagina di login
+
+/*
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
+    }
+*/
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
+        /*
+         *  Controllo che i parametri passati dal client non siano nulli: se lo sono restituisco
+         *  come codice di stato 400 BAD_REQUEST
+         */
         if(request.getParameter("username") == null || request.getParameter("password")== null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.reset();
         }
-        // r    ecupera la mappa dall'application context
-        users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
-        String md5_password = password/*get_MD5_Password(password)*/;
 
+        /*
+         *  Recupero dall'application context la mappa contente la lista di utenti registrati.
+         *  Questa contiene, per ogni utente le sue credenziali di accesso
+         */
+        users = (ConcurrentHashMap<String, User>) this.getServletConfig().getServletContext().getAttribute("users");
+        String md5_password = password;
+
+        /*
+         *  Controllo se quel determinato utente è presente nella lista di utenti registrati
+         *  e che i parametri passati dal client siano corretti confrontandoli con quelli
+         *  presenti nella lista
+         */
         if(users.get(username) != null
                 && users.get(username).getUsername().equals(username)
                 && users.get(username).getPassword().equals(md5_password)){
@@ -50,57 +68,44 @@ public class    LoginServlet extends HttpServlet {
             session = request.getSession();
             session.setAttribute("user", username);
 
-            // response.sendRedirect(request.getContextPath() + "/position");
             RequestDispatcher dispatcher;
             dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/home.jsp");
             dispatcher.forward(request, response);
         }
         else {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            // response.sendRedirect(request.getContextPath() + "/login");
-            //  response.getWriter().println("<html><body><p> Login error </p></body></html>" + HttpServletResponse.SC_FORBIDDEN);
         }
-        // se arrivo qua significa che non mi sono loggato
-        // PrintWriter out = response.getWriter();
-        // out.print(messages);
-        // request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-}
-
-    public String get_MD5_Password(String passwordToHash) throws IOException {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(passwordToHash.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
-
     }
 
     @Override
     public void init() {
-        ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();
-        ;
 
-        // salva la concurrentHashMap nel contest applicativo
+        ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+
+        // Salvataggio nel contest applicativo della concurrentHashMap contenente la lista di utenti
         this.getServletConfig()
                 .getServletContext()
                 .setAttribute("users", users);
 
-        // leggi da file
+        // Lettura da file
         String fileName = getServletContext().getRealPath(File.separator + "WEB-INF" + File.separator + "users.txt");
         BufferedReader br = null;
+
         try {
             br = new BufferedReader(new FileReader(fileName));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            // lanciare internal server error exception
         }
+
+        /*
+         *  Nel file users.txt sono memorizzati tutti gli utenti registrati (uno per ogni riga)
+         *  con le relative credenziali d'accesso nel seguente formato:
+         *                      username:password_md5
+         *  Pertanto leggo il contenuto del file per righe e splitto ciascuna riga secondo il
+         *  separatore ':' in modo da ottenere separatamente username e password_md5
+         *  Questi due parametri vengono passati al costruttore per poter creare un oggetto User
+         *  per ogni utente: tale oggetto User viene poi inserito nella lista al fine di popolarla
+         */
         try {
             String line = br.readLine();
             String[] tokens;
@@ -120,27 +125,4 @@ public class    LoginServlet extends HttpServlet {
             }
         }
     }
-
-
 }
-
-
-
-
-
-        /*
-        Map<String, String> messages = new HashMap<String, String>();
-
-        if(username == null || username.isEmpty()){
-            messages.put("username", "Please enter username");
-        }
-
-        if(password == null || password.isEmpty()){
-            messages.put("password", "Please enter password");
-        }
-
-        if(messages.isEmpty()){
-        */
-
-
-

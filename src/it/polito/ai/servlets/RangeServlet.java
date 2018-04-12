@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,7 +37,7 @@ public class RangeServlet extends HttpServlet{
         String currentUsername = (String)session.getAttribute("user");
 
         // verifica dei parametri passato dal client nella richiesta
-        if(req.getParameter("startTimestamp") == null || req.getParameter("endTimestmap")== null) {
+        if(req.getParameter("startTimestamp") == null || req.getParameter("endTimestamp")== null) {
             // la richiesta del client non è valida
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.reset();
@@ -56,13 +54,13 @@ public class RangeServlet extends HttpServlet{
             // la lista delle posizioni dell'utente non è vuota
 
             // se endTimestamp > ultimo timestamp della lista, allora aggiorna endTimeStamp all'ultimo timestamp della lista
-            if (endTimestamp > currentUser.getPositionList().getLast().getTimeStamp()) {
-                endTimestamp = currentUser.getPositionList().getLast().getTimeStamp();
+            if (endTimestamp > currentUser.getPositionList().getLast().getTimestamp()) {
+                endTimestamp = currentUser.getPositionList().getLast().getTimestamp();
             }
 
             // se starTimestamp < primo timestamp della lista, allora aggiorna startTimestamp al primo timestamp della lista
-            if (startTimestamp < currentUser.getPositionList().getFirst().getTimeStamp()) {
-                startTimestamp = currentUser.getPositionList().getFirst().getTimeStamp();
+            if (startTimestamp < currentUser.getPositionList().getFirst().getTimestamp()) {
+                startTimestamp = currentUser.getPositionList().getFirst().getTimestamp();
             }
 
             // non è ammesso il caso starTimeStamp > endTimestamp
@@ -73,7 +71,7 @@ public class RangeServlet extends HttpServlet{
 
             // riempi la lista rangeList con le posizioni che rientrano nel range richiesto dal client
             for (Position p : currentUser.getPositionList()) {
-                if (p.getTimeStamp() >= startTimestamp && p.getTimeStamp() <= endTimestamp) {
+                if (p.getTimestamp() >= startTimestamp && p.getTimestamp() <= endTimestamp) {
                     rangeList.add(p);
                 }
             }
